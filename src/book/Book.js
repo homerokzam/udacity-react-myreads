@@ -2,10 +2,13 @@ import React, { Component } from 'react';
 
 class Book extends Component {
   render() {
+    const url = this.props.book.imageLinks ? this.props.book.imageLinks.smallThumbnail : '';
+    //console.log(url);
+
     return(
       <div className="book">
         <div className="book-top">
-          <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url("${this.props.book.imageLinks.smallThumbnail}")` }}></div>
+          <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: url ? `url("${url}")` : 'none' }}></div>
           <div className="book-shelf-changer">
             <select value={this.props.book.shelf} onChange={(e) => { this.props.handleChangeShelf(e, this.props.book) }}>
               <option value="move" disabled>Move to...</option>
