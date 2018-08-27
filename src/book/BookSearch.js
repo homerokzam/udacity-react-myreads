@@ -14,7 +14,7 @@ class BookSearch extends Component {
     console.log(this.props);
     //console.log(this.props.location);
     this.state.books = this.props.location.params ? this.props.location.params : [];
-    console.log(this.state.books);
+    //console.log(this.state.books);
   }
 
   state = {
@@ -25,20 +25,20 @@ class BookSearch extends Component {
 
   handleChange(e) {
     const value = e.target.value;
-    this.setState({query: value});
+    this.setState({...this.state, query: value});
     this.searchBooks(value);
   }
 
   searchBooks(query) {
     if (!query) {
-      this.setState({searchResults: []});
+      this.setState({...this.state, searchResults: []});
       return;
     }
 
     BooksAPI.search(query, 20)
       .then((searchResults) => {
         if (!searchResults || searchResults.error) {
-          this.setState({searchResults: []});
+          this.setState({...this.state, searchResults: []});
           return;
         }
 
@@ -48,7 +48,7 @@ class BookSearch extends Component {
           return book;
         });
 
-        this.setState({searchResults});
+        this.setState({...this.state, searchResults});
       });
   }
 
@@ -78,7 +78,10 @@ class BookSearch extends Component {
           {
             this.state.searchResults && this.state.searchResults.map((book, index) => (
               <li key={book.id + index}>
-                <Book book={book} onShelfChange={this.props.onShelfChange}/>
+                <Book book={book} handleChangeShelf={(e, book) => {
+                  this.props.location.handleChangeShelf(e, book);
+                  this.setState({...this.state, searchResults: this.state.searchResults.filter(b => { return b.id !== book.id })});
+                }} />
               </li>
             ))
           }

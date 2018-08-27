@@ -11,17 +11,22 @@ class BookList extends Component {
     this.handleChangeShelf = this.handleChangeShelf.bind(this);
   }
 
+  canRefresh = true;
+
   state = {
     books: []
   };
 
   handleChangeShelf(e, book) {
     const shelf = e.target.value;
-    console.log(shelf);
-    console.log(book);
+    //console.log(shelf);
+    //console.log(book);
 
     BooksAPI.update(book, shelf)
-      .then(() => { this.refresh() });
+      .then(() => {
+        if (this.canRefresh)
+          this.refresh();
+      });
   };
 
   refresh() {
@@ -31,8 +36,19 @@ class BookList extends Component {
   };
 
   componentWillMount() {
+    console.log("componentWillMount");
+    this.canRefresh = true;
+    this.setState({ books: this.state.books });
     this.refresh();
-  };  
+    console.log(this.canRefresh);
+  };
+
+  componentWillUnmount() {
+    console.log("componentWillUnmount");
+    this.canRefresh = false;
+    this.setState({ books: this.state.books });
+    console.log(this.canRefresh);
+  };
 
   render() {
     const currentlyReadings = this.state.books.filter((book) => book.shelf === 'currentlyReading');
@@ -50,7 +66,7 @@ class BookList extends Component {
           <ListBooksContent bookShelfTitle="Read" books={reads} handleChangeShelf={this.handleChangeShelf} />
         </div>
         <div className="open-search">
-          <Link to={ {pathname: 'search', params: this.state.books} }>Add a book</Link>
+          <Link to={ {pathname: 'search', params: this.state.books, handleChangeShelf: this.handleChangeShelf} }>Add a book</Link>
         </div>
       </div>
     );
